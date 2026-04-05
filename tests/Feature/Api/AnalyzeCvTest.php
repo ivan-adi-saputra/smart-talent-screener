@@ -39,5 +39,8 @@ it('validates cv file upload', function () {
     $response = $this->postJson('/api/analyze-cv', []);
 
     $response->assertStatus(422)
-             ->assertJsonValidationErrors(['cv_file']);
+             ->assertJson([
+                 'status' => 'error',
+                 'message' => 'The cv file field is required.',
+             ]);
 });

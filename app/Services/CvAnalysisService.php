@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Services\CvParsingService;
 use App\Integrations\GeminiAI;
 use App\Models\Candidate;
 use Illuminate\Http\UploadedFile;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 class CvAnalysisService
 {
     public function __construct(
+        protected CvParsingService $cvParsingService,
         protected GeminiAI $geminiAi
     ) {}
 
@@ -18,17 +20,18 @@ class CvAnalysisService
         // 1. Storage
         $path = $file->store('cv_uploads', 'public');
 
-        // 2. Placeholder for text extraction (MVP)
-        $text = "Simulated text extraction from " . $file->getClientOriginalName();
+        // 2. CV Parsing
+        $parsedData = $this->cvParsingService->parse($file);
+        $rawText = $parsedData['raw_text'] ?? '';
 
-        // 3. Call AI Integration
-        $analysis = $this->geminiAi->analyzeCandidate($text);
+        // 3. Call AI Integration (Pass real text)
+        $analysis = $this->geminiAi->analyzeCandidate($rawText);
 
-        // 4. Store to Database
+        // 4. Store to Database (Merge parsed data with AI results)
         $candidate = Candidate::create([
-            'name' => $analysis['name'] ?? 'Unknown Candidate',
-            'email' => $analysis['email'] ?? 'unknown@example.com',
-            'phone' => $analysis['phone'] ?? null,
+            'name' => $analysis['name'] ?? ($parsedData['name'] ?? 'Unknown Candidate'),
+            'email' => $analysis['email'] ?? ($parsedData['email'] ?? 'unknown@example.com'),
+            'phone' => $analysis['phone'] ?? ($parsedData['phone'] ?? null),
             'summary' => $analysis['summary'] ?? '',
             'score' => $analysis['score'] ?? 0,
             'raw_cv_path' => $path,
