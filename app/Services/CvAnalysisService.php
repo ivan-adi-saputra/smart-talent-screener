@@ -41,7 +41,8 @@ class CvAnalysisService
             'tools' => $analysis['tools'] ?? [],
             'in_demand_skills' => $analysis['in_demand_skills'] ?? [],
             'job_matches' => $analysis['job_matches'] ?? [],
-            'recommendation' => $analysis['recommendation'] ?? '',
+            'recommendation' => $analysis['recommendation'] ?? [],
+            'cv_recommendation' => $analysis['cv_recommendation'] ?? [],
         ]);
 
         return $candidate->toArray();

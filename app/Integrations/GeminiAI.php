@@ -22,8 +22,7 @@ class GeminiAI
     public function analyzeCandidate(string $text): array
     {
         if (empty($this->apiKey)) {
-            Log::warning('Gemini API key is not set. Using fallback simulation.');
-            return $this->fallbackResponse($text);
+            throw new Exception('Gemini API key is not set.');
         }
 
         try {
@@ -48,23 +47,27 @@ class GeminiAI
             ]);
 
             if ($response->failed()) {
-                Log::error("Gemini API request failed: " . $response->body());
-                return $this->fallbackResponse($text);
+                $errorMessage = $response->json()['error']['message'] ?? $response->body();
+                throw new Exception("Gemini API request failed: " . $errorMessage);
             }
 
             $result = $response->json();
             $content = $result['candidates'][0]['content']['parts'][0]['text'] ?? null;
 
             if (!$content) {
-                Log::error("Invalid response format from Gemini API: " . $response->body());
-                return $this->fallbackResponse($text);
+                throw new Exception("Invalid response format from Gemini API");
             }
 
-            return json_decode($content, true) ?: $this->fallbackResponse($text);
+            $decoded = json_decode($content, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception("Failed to decode Gemini AI response as JSON: " . json_last_error_msg());
+            }
 
-        } catch (\Exception $e) {
+            return $decoded;
+
+        } catch (Exception $e) {
             Log::error('Gemini Analysis Error: ' . $e->getMessage());
-            return $this->fallbackResponse($text);
+            throw $e; // Propagate exception to be handled by the controller
         }
     }
 
@@ -92,28 +95,18 @@ JSON STRUCTURE REQUIRED:
     "job_matches": [
         {"role": "Role Name", "match_percentage": 0-100}
     ],
-    "recommendation": "Brief recommendation (strengths & weaknesses)"
+    "recommendation": {
+        "strengths": ["Strength 1", "Strength 2"],
+        "weaknesses": ["Weakness 1", "Weakness 2"],
+        "suggestions": ["Suggestion 1", "Suggestion 2"]
+    },
+    "cv_recommendation": {
+        "good_points": ["Point 1", "Point 2"],
+        "improvement_points": ["Point 1", "Point 2"]
+    }
 }
 
 Ensure the output is ONLY the JSON object. Do not include markdown formatting or extra text.
 PROMPT;
-    }
-
-    protected function fallbackResponse(string $text): array
-    {
-        return [
-            'name' => 'Unknown (AI Fallback)',
-            'email' => 'unknown@example.com',
-            'phone' => null,
-            'summary' => 'AI analysis failed or key missing. This is a fallback response.',
-            'score' => 0,
-            'skills' => [],
-            'technical_skills' => [],
-            'soft_skills' => [],
-            'tools' => [],
-            'in_demand_skills' => [],
-            'job_matches' => [],
-            'recommendation' => 'Manual review required as AI analysis could not be completed at this time.',
-        ];
     }
 }

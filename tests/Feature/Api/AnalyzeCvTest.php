@@ -3,6 +3,7 @@
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Candidate;
+use Illuminate\Support\Facades\Http;
 
 it('can analyze a cv file', function () {
     Storage::fake('public');
@@ -27,7 +28,15 @@ it('can analyze a cv file', function () {
                                 'tools' => ['Git'],
                                 'in_demand_skills' => ['AI'],
                                 'job_matches' => [['role' => 'Dev', 'match_percentage' => 90]],
-                                'recommendation' => 'Good candidate.'
+                                'recommendation' => [
+                                    'strengths' => ['Exp'],
+                                    'weaknesses' => [],
+                                    'suggestions' => []
+                                ],
+                                'cv_recommendation' => [
+                                    'good_points' => ['Clear'],
+                                    'improvement_points' => []
+                                ]
                             ])]
                         ]
                     ]

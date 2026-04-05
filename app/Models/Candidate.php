@@ -20,6 +20,7 @@ class Candidate extends Model
         'in_demand_skills',
         'job_matches',
         'recommendation',
+        'cv_recommendation',
     ];
 
     protected $casts = [
@@ -29,5 +30,7 @@ class Candidate extends Model
         'tools' => 'array',
         'in_demand_skills' => 'array',
         'job_matches' => 'array',
+        'recommendation' => 'array',
+        'cv_recommendation' => 'array',
     ];
 }

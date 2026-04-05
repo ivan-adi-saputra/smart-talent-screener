@@ -67,7 +67,7 @@ class CvParsingService
 
         // Phone extraction (basic)
         if (preg_match('/(\+?62|0)[0-9\- \(\)]{8,15}/', $text, $matches)) {
-            $data['phone'] = trim($matches[0]);
+            $data['phone'] = $this->normalizePhoneNumber($matches[0]);
         }
 
         // Name extraction (Naive: First line or based on common patterns)
@@ -77,5 +77,23 @@ class CvParsingService
         }
 
         return $data;
+    }
+
+    protected function normalizePhoneNumber(string $phone): string
+    {
+        // Remove all non-numeric characters
+        $digits = preg_replace('/[^0-9]/', '', $phone);
+
+        // If it starts with 62, replace with 0
+        if (str_starts_with($digits, '62')) {
+            $digits = '0' . substr($digits, 2);
+        }
+
+        // Ensure it starts with 08 if it's an Indonesian mobile number
+        if (str_starts_with($digits, '8')) {
+            $digits = '0' . $digits;
+        }
+
+        return $digits;
     }
 }

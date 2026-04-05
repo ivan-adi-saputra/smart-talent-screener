@@ -19,6 +19,15 @@ it('parses real gemini response correctly', function () {
                                 'score' => 95,
                                 'summary' => 'Expert React developer',
                                 'skills' => ['React', 'JavaScript'],
+                                'recommendation' => [
+                                    'strengths' => ['Exp'],
+                                    'weaknesses' => [],
+                                    'suggestions' => []
+                                ],
+                                'cv_recommendation' => [
+                                    'good_points' => ['Clear'],
+                                    'improvement_points' => []
+                                ]
                             ])
                         ]
                     ]
@@ -39,7 +48,7 @@ it('parses real gemini response correctly', function () {
         ->and($result['score'])->toBe(95);
 });
 
-it('returns fallback on api failure', function () {
+it('throws exception on api failure', function () {
     Config::set('services.gemini.key', 'test-key');
 
     Http::fake([
@@ -47,17 +56,12 @@ it('returns fallback on api failure', function () {
     ]);
 
     $gemini = new GeminiAI();
-    $result = $gemini->analyzeCandidate('Sample CV text');
+    $gemini->analyzeCandidate('Sample CV text');
+})->throws(Exception::class);
 
-    expect($result['name'])->toBe('Unknown (AI Fallback)')
-        ->and($result['score'])->toBe(0);
-});
-
-it('returns fallback when api key is missing', function () {
+it('throws exception when api key is missing', function () {
     Config::set('services.gemini.key', null);
 
     $gemini = new GeminiAI();
-    $result = $gemini->analyzeCandidate('Sample CV text');
-
-    expect($result['name'])->toBe('Unknown (AI Fallback)');
-});
+    $gemini->analyzeCandidate('Sample CV text');
+})->throws(Exception::class);
