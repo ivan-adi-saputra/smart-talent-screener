@@ -1,20 +1,30 @@
 # Smart Talent Screener
 
-🚀 **Smart Talent Screener** is an AI-powered platform for screening and analyzing candidate CVs, built with Laravel, Vue.js, and PostgreSQL (Supabase).
+🚀 **Smart Talent Screener** is an AI-powered platform for screening and analyzing candidate CVs, built with Laravel, React.js, and PostgreSQL (Supabase).
 
 ## 🧱 Tech Stack
 
 - **Backend:** Laravel 11.x
-- **Frontend:** Vue.js 3.x (Inertia.ts)
+- **Frontend:** React.js 18.x (Inertia.ts)
+- **Styling:** Tailwind CSS
+- **State Management:** Zustand
 - **Database:** PostgreSQL (Supabase)
-- **Authentication:** Laravel Breeze
 - **AI Integration:** Gemini AI
 
 ## 🗂️ Project Structure
 
+### Frontend (React)
+
+- `resources/js/components`: UI Components.
+- `resources/js/pages`: Page-level components.
+- `resources/js/layouts`: Layout wrappers.
+- `resources/js/store`: Zustand state management.
+- `resources/js/utils`: Helper functions.
+
+### Backend (Laravel)
+
 - `app/Services`: Business logic layer.
 - `app/Integrations`: External API integration layer (e.g., Gemini AI).
-- `resources/js`: Vue.js components and frontend logic.
 
 ## 🚀 Getting Started
 
@@ -51,6 +61,6 @@
 
 ## 🧭 Notes
 
-- This is a scaffolding phase.
-- AI integration logic is located in `app/Integrations/GeminiAI.php`.
-- Business logic should be placed in `app/Services`.
+- This is the initial refactor from Vue to React.
+- State management uses **Zustand** located in `resources/js/store`.
+- Business logic should be placed in the Service layer.
