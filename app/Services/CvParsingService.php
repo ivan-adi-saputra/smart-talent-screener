@@ -79,7 +79,7 @@ class CvParsingService
         return $data;
     }
 
-    protected function normalizePhoneNumber(string $phone): string
+    public function normalizePhoneNumber(string $phone): string
     {
         // Remove all non-numeric characters
         $digits = preg_replace('/[^0-9]/', '', $phone);
@@ -94,6 +94,6 @@ class CvParsingService
             $digits = '0' . $digits;
         }
 
-        return $digits;
+        return trim($digits);
     }
 }

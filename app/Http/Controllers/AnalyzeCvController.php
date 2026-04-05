@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests\AnalyzeCvRequest;
 use App\Services\CvAnalysisService;
+use App\Http\Resources\CandidateResource;
 use Illuminate\Http\JsonResponse;
 
 class AnalyzeCvController extends Controller
@@ -20,11 +21,14 @@ class AnalyzeCvController extends Controller
     public function __invoke(AnalyzeCvRequest $request): JsonResponse
     {
         try {
-            $result = $this->cvAnalysisService->analyze(
+            $candidate = $this->cvAnalysisService->analyze(
                 $request->file('cv_file')
             );
 
-            return $this->success($result, 'CV analyzed successfully');
+            return $this->success(
+                new CandidateResource($candidate),
+                'CV analyzed successfully'
+            );
         } catch (\Exception $e) {
             return $this->error('Analysis failed: ' . $e->getMessage(), 500, [], true, 60);
         }

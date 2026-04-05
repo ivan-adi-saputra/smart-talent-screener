@@ -62,7 +62,8 @@ it('can analyze a cv file', function () {
                      'skills',
                      'job_matches',
                  ],
-             ]);
+             ])
+             ->assertJsonMissing(['created_at', 'updated_at']);
 
     $this->assertDatabaseHas('candidates', [
         'email' => 'john.doe@example.com', // Match with simulated data in GeminiAI

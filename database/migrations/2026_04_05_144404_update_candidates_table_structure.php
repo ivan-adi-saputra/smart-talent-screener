@@ -12,8 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // DB::statement to force data type conversion with 'USING'
-        DB::statement('ALTER TABLE candidates ALTER COLUMN recommendation TYPE JSON USING recommendation::json');
+        // DB::statement to force data type conversion with 'USING' for PostgreSQL
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE candidates ALTER COLUMN recommendation TYPE JSON USING recommendation::json');
+        }
 
         Schema::table('candidates', function (Blueprint $table) {
             // After the data type changes, then set NOT NULL

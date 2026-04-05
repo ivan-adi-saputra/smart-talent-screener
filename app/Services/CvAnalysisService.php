@@ -15,7 +15,7 @@ class CvAnalysisService
         protected GeminiAI $geminiAi
     ) {}
 
-    public function analyze(UploadedFile $file): array
+    public function analyze(UploadedFile $file): Candidate
     {
         // 1. Storage
         $path = $file->store('cv_uploads', 'public');
@@ -28,10 +28,10 @@ class CvAnalysisService
         $analysis = $this->geminiAi->analyzeCandidate($rawText);
 
         // 4. Store to Database (Merge parsed data with AI results)
-        $candidate = Candidate::create([
+        return Candidate::create([
             'name' => $analysis['name'] ?? ($parsedData['name'] ?? 'Unknown Candidate'),
             'email' => $analysis['email'] ?? ($parsedData['email'] ?? 'unknown@example.com'),
-            'phone' => $analysis['phone'] ?? ($parsedData['phone'] ?? null),
+            'phone' => $this->cvParsingService->normalizePhoneNumber($analysis['phone'] ?? ($parsedData['phone'] ?? '')),
             'summary' => $analysis['summary'] ?? '',
             'score' => $analysis['score'] ?? 0,
             'raw_cv_path' => $path,
@@ -44,7 +44,5 @@ class CvAnalysisService
             'recommendation' => $analysis['recommendation'] ?? [],
             'cv_recommendation' => $analysis['cv_recommendation'] ?? [],
         ]);
-
-        return $candidate->toArray();
     }
 }
