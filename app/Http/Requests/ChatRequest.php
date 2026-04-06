@@ -30,6 +30,16 @@ class ChatRequest extends FormRequest
         return [
             'candidate_id' => 'required|exists:candidates,id',
             'message' => 'required|string',
+            'parent_id' => [
+                'nullable',
+                'exists:chats,id',
+                function ($attribute, $value, $fail) {
+                    $parent = \App\Models\Chat::find($value);
+                    if ($parent && $parent->candidate_id != $this->candidate_id) {
+                        $fail('The parent chat must belong to the same candidate.');
+                    }
+                },
+            ],
         ];
     }
 

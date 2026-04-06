@@ -8,6 +8,7 @@ class Chat extends Model
 {
     protected $fillable = [
         'candidate_id',
+        'parent_id',
         'message',
         'response',
     ];
@@ -15,5 +16,15 @@ class Chat extends Model
     public function candidate()
     {
         return $this->belongsTo(Candidate::class);
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Chat::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Chat::class, 'parent_id');
     }
 }

@@ -22,7 +22,11 @@ class ChatController extends Controller
     {
         try {
             $candidate = Candidate::findOrFail($request->candidate_id);
-            $chat = $this->chatService->answerQuestion($candidate, $request->message);
+            $chat = $this->chatService->answerQuestion(
+                $candidate, 
+                $request->message, 
+                $request->parent_id
+            );
 
             return $this->success(
                 new ChatResource($chat),

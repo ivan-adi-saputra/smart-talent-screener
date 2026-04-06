@@ -22,8 +22,13 @@ trait ApiResponse
     /**
      * Response Error with Optional Caching
      */
-    protected function error(string $message, int $code, $errors = [], bool $shouldCache = false, int $ttl = 60): JsonResponse
+    protected function error(string $message, $code, $errors = [], bool $shouldCache = false, int $ttl = 60): JsonResponse
     {
+        // Ensure status code is valid for HTTP (100-599)
+        if (!is_numeric($code) || $code < 100 || $code >= 600) {
+            $code = 500;
+        }
+
         $responseStructure = [
             'status'  => 'error',
             'message' => $message,
