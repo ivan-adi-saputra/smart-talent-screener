@@ -21,6 +21,7 @@ class Candidate extends Model
         'job_matches',
         'recommendation',
         'cv_recommendation',
+        'raw_text',
     ];
 
     protected $casts = [
@@ -32,5 +33,6 @@ class Candidate extends Model
         'job_matches' => 'array',
         'recommendation' => 'array',
         'cv_recommendation' => 'array',
+        'raw_text' => 'string',
     ];
 }

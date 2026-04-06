@@ -43,6 +43,7 @@ class CvAnalysisService
             'job_matches' => $analysis['job_matches'] ?? [],
             'recommendation' => $analysis['recommendation'] ?? [],
             'cv_recommendation' => $analysis['cv_recommendation'] ?? [],
+            'raw_text' => $rawText,
         ]);
     }
 }
