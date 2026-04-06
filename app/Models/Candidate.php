@@ -35,4 +35,9 @@ class Candidate extends Model
         'cv_recommendation' => 'array',
         'raw_text' => 'string',
     ];
+
+    public function chats()
+    {
+        return $this->hasMany(Chat::class);
+    }
 }

@@ -6,8 +6,9 @@ use App\Traits\ApiResponse;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class AnalyzeCvRequest extends FormRequest
+class ChatRequest extends FormRequest
 {
     use ApiResponse;
     
@@ -19,10 +20,16 @@ class AnalyzeCvRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
     public function rules(): array
     {
         return [
-            'cv_file' => 'required|file|mimes:pdf,doc,docx|max:2048',
+            'candidate_id' => 'required|exists:candidates,id',
+            'message' => 'required|string',
         ];
     }
 

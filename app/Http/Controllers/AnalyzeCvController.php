@@ -30,7 +30,7 @@ class AnalyzeCvController extends Controller
                 'CV analyzed successfully'
             );
         } catch (\Exception $e) {
-            return $this->error('Analysis failed: ' . $e->getMessage(), 500, [], true, 60);
+            return $this->error('Analysis failed: ' . $e->getMessage(), $e->getCode(), [], true, 60);
         }
     }
 }

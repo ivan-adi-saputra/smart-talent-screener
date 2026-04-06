@@ -11,12 +11,74 @@ class GeminiAI
     protected string $apiKey;
     protected string $model;
     protected string $baseUrl;
+    protected string $url;
 
     public function __construct()
     {
         $this->apiKey = config('services.gemini.key') ?? '';
         $this->model = config('services.gemini.model');
         $this->baseUrl = config('services.gemini.base_url');
+        $this->url = "{$this->baseUrl}/{$this->model}:generateContent";
+    }
+
+    public function chat(string $context, string $message): string
+    {
+        if (empty($this->apiKey)) {
+            throw new Exception('Gemini API key is not set.');
+        }
+
+        try {
+            $prompt = $this->getChatPrompt($context, $message);
+            
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'x-goog-api-key' => $this->apiKey,
+            ])
+            ->post($this->url, [
+                'contents' => [
+                    [
+                        'parts' => [
+                            ['text' => $prompt]
+                        ]
+                    ]
+                ]
+            ]);
+
+            if ($response->failed()) {
+                $errorMessage = $response->json()['error']['message'] ?? $response->body();
+                throw new Exception("Gemini API request failed: " . $errorMessage);
+            }
+
+            $result = $response->json();
+            $content = $result['candidates'][0]['content']['parts'][0]['text'] ?? null;
+
+            if (!$content) {
+                throw new Exception("Invalid response format from Gemini API");
+            }
+
+            return $content;
+
+        } catch (Exception $e) {
+            Log::error('Gemini Chat Error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    protected function getChatPrompt(string $context, string $message): string
+    {
+        return <<<PROMPT
+You are an AI assistant helping a recruiter analyze a candidate's CV.
+Use the following CV context to answer the user's question.
+If the answer is not in the context, say that you don't have that information based on the CV.
+
+CV CONTEXT:
+{$context}
+
+USER QUESTION:
+{$message}
+
+ANSWER:
+PROMPT;
     }
 
     public function analyzeCandidate(string $text): array
@@ -27,13 +89,12 @@ class GeminiAI
 
         try {
             $prompt = $this->getPrompt($text);
-            $url = "{$this->baseUrl}/{$this->model}:generateContent";
             
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'x-goog-api-key' => $this->apiKey,
             ])
-            ->post($url, [
+            ->post($this->url, [
                 'contents' => [
                     [
                         'parts' => [
